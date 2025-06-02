@@ -1,9 +1,8 @@
 ---
 layout: ../layouts/Layout.astro
-title: Research Project Page Template
-description: Simple project page template for your research paper, built with Astro and Tailwind CSS
-favicon: favicon.svg
-thumbnail: screenshot-light.png
+title: Gradient Similarity Surgery in Multi-task Deep Learning
+description: Official implementation of the **SAM-GS** optimizer for multitask learning
+
 ---
 
 import Header from "../components/Header.astro";
@@ -13,17 +12,22 @@ import SmallCaps from "../components/SmallCaps.astro";
 import Figure from "../components/Figure.astro";
 import Image from "../components/Image.astro";
 import TwoColumns from "../components/TwoColumns.astro";
+import ThreeColumns from "../components/ThreeColumns.astro";
 import YouTubeVideo from "../components/YouTubeVideo.astro";
 import LaTeX from "../components/LaTeX.astro";
 
 import { ImageComparison } from "../components/ImageComparison.tsx";
 
-import outside from "../assets/outside.mp4";
-import transformer from "../assets/transformer.webp";
-import Splat from "../components/Splat.tsx"
-import dogsDiffc from "../assets/dogs-diffc.png"
-import dogsTrue from "../assets/dogs-true.png"
-
+import pareto from "../assets/pareto.mp4";
+import gradient from "../assets/gradient.png";
+import Splat from "../components/Splat.tsx";
+import samgs from "../assets/samgs.png";
+import img1of1 from "../assets/1o/f1_3d.png";
+import img1of2 from "../assets/1o/f2_3d.png";
+import img1of12 from "../assets/1o/f12_3d.png";
+import img2of1 from "../assets/2o/f1_3d.png";
+import img2of2 from "../assets/2o/f2_3d.png";
+import img2of12 from "../assets/2o/f12_3d.png"; 
 
 import CodeBlock from "../components/CodeBlock.astro";
 import Table from "../components/Table.astro";
@@ -33,131 +37,137 @@ export const components = {pre: CodeBlock, table: Table}
   title={frontmatter.title}
   authors={[
     {
-      name: "Roman Hauksson",
-      url: "https://roman.technology",
-      institution: "Independent",
-      notes: ["*", "†"],
+      name: "Thomas Borsani",
+      url: "https://github.com/ThomBors",
+      notes: ["1"],
     },
     {
-      name: "Author Two",
-      institution: "Institution Two",
-      notes: ["*", "†"],
+      name: "Andrea Rosani",
+      notes: ["1"],
     },
     {
-      name: "Author Three",
-      institution: "Institution Three",
-      notes: ["†"],
+      name: "Giuseppe Nicosia",
+      notes: ["2"],
     },
     {
-      name: "Author Four",
-      institution: "Institution Four",
+      name: "Giuseppe Di Fatta",
+      notes: ["2"],
     },
   ]}
-  conference="Conference Name"
+  conference="ECML PKDD 2025"
   notes={[
     {
-      symbol: "*",
-      text: "author note one",
+      symbol: "1",
+      text: "Free University of Bozen-Bolzano",
     },
     {
-      symbol: "†",
-      text: "author note two",
+      symbol: "2",
+      text: "University of Catania",
     },
   ]}
   links={[
     {
-      name: "Paper",
-      url: "",
-      icon: "ri:file-pdf-2-line",
-    },
-    {
       name: "Code",
-      url: "https://github.com/RomanHauksson/academic-project-astro-template",
+      url: "https://github.com/ThomBors/samgs",
       icon: "ri:github-line",
     },
     {
       name: "arXiv",
       url: "",
       icon: "academicons:arxiv",
-    },
-    {
-      name: "Bluesky",
-      url: "",
-      icon: "ri:bluesky-line"
     }
   ]}
   />
 
-<Video source={outside} />
+<Video source={pareto} />
 
 <HighlightedSection>
 
 ## Abstract
 
-This is a live demo for a template you can use to create a simple project page for your research paper. See the code for the template and instructions on how to use it yourself [here](https://github.com/RomanHauksson/academic-project-astro-template). It's made with the [Astro web framework](https://astro.build/) and styled with [Tailwind CSS](https://tailwindcss.com/). You write the content in [MDX](https://mdxjs.com/), which enables markdown formatting like **bold**, _italics_, and ~strikethrough~, as well as custom components like <SmallCaps>small caps.</SmallCaps>
+The multi-task learning (*MTL*) paradigm aims to simultaneously learn multiple tasks, within a single model, capturing higher-level, more general hidden patterns that are shared by the tasks. 
+In deep learning, a significant challenge in the backpropagation training process is the design of advanced optimisers to improve the convergence speed and stability of the gradient descent learning rule. 
+In particular, in multi-task deep learning (*MTDL*) the multitude of tasks may generate potentially *conflicting gradients* that would hinder the concurrent convergence of the diverse loss functions. 
+This challenge arises when the gradients of the task objectives have either different magnitudes or opposite directions, causing one or a few to dominate or to interfere with each other, thus degrading the training process.
+Gradient surgery methods address the problem explicitly dealing with conflicting gradients by adjusting the overall gradient trajectory.
+This work introduces a novel gradient surgery method, the Similarity-Aware Momentum Gradient Surgery (**SAM-GS**), which provides an effective and scalable approach based on a gradient magnitude similarity measure to guide the optimisation process.
+The **SAM-GS** surgery adopts gradient equalisation and modulation of the *first-order momentum*.
+A series of experimental tests have shown the effectiveness of **SAM-GS** on synthetic problems and *MTL* benchmarks. Gradient magnitude similarity plays an important role in *regularising gradient aggregation* in *MTDL* for the optimisation of the learning process.
 
 </HighlightedSection>
 
-## Figures
+## Methods
 
-Use the figure component to display images, videos, equations, or any other element, with an optional caption.
+The proposed approach focuses solely on *magnitude gradient conflicts*, which are arguably the most critical impediment to effective *MTDL* optimisation.  
+*Angle-based gradient conflicts* are intentionally disregarded, as they primarily affect convergence speed rather than convergence feasibility.
+
+Let us examine why *angle-based gradient conflicts* may slow down convergence, while *magnitude gradient conflicts* can severely hinder the overall optimisation process—potentially preventing certain tasks from converging altogether.
+
+When adding two task gradients <LaTeX inline formula="\mathbf{g}_i" /> and <LaTeX inline formula="\mathbf{g}_j" /> of similar magnitude (<LaTeX inline formula="|\mathbf{g}_i| \simeq |\mathbf{g}_j|" />), but with an angle <LaTeX inline formula="\alpha > 90^{\circ}" /> between them, the magnitude of their sum is reduced due to destructive interference. Specifically, the resultant magnitude is scaled by a factor proportional to <LaTeX inline formula="\cos(\alpha)" />, as illustrated in Figures <a href="#fig:a">a</a> and <a href="#fig:b">b</a>.  
+In the worst-case scenario—<LaTeX inline formula="\alpha = 180^\circ" />—the gradients point in exactly opposite directions and cancel each other out. However, such extreme angular conflicts are rare in practice. Even when partially cancelling, the resulting vector still encodes meaningful optimisation direction, which can be amplified by first-order momentum mechanisms without explicitly resolving the angle conflict.
+
+In contrast, when one task’s gradient is significantly larger than the others (<LaTeX inline formula="|\mathbf{g}_i| \gg |\mathbf{g}_j|" />), the aggregated gradient direction becomes dominated by that task. This is much more harmful, as it biases the optimisation process toward a single objective, effectively stalling learning for other tasks (see Figure <a href="#fig:c">c</a>).  
 
 <Figure>
-  <Image slot="figure" source={transformer} altText="Diagram of the transformer deep learning architecture." />
-  <span slot="caption">Diagram of the transformer deep learning architecture.</span>
+  <Image slot="figure" source={gradient} altText="Illustration of four scenarios for two task gradients, gi and gj, the standard overall gradient is denoted as gi + gj and the overall gradient of SAM-GS is denote as gSAM. 
+  (a) Ideal case: Gradients have similar magnitudes, and the angle between them is less than 90◦, indicating no conflict. 
+  (b) angle-based gradient conflict: The angle between gradients exceeds 90◦, diminishing the effectiveness of their combination. 
+  (c) magnitude-based gradient conflict: One gradient dominates, leading to an imbalanced gradient update. 
+  (d) Both conflicts: A combination of angle- and magnitude-based gradient conflicts, where both the directional misalignment and magnitude disparity hinder effective gradient aggregation." />
+  <span slot="caption">IIllustration of four scenarios for two task gradients, gi and gj, the standard overall gradient is denoted as gi + gj and the overall gradient of SAM-GS is denote as gSAM. 
+  (a) Ideal case: Gradients have similar magnitudes, and the angle between them is less than 90◦, indicating no conflict. 
+  (b) angle-based gradient conflict: The angle between gradients exceeds 90◦, diminishing the effectiveness of their combination. 
+  (c) magnitude-based gradient conflict: One gradient dominates, leading to an imbalanced gradient update. 
+  (d) Both conflicts: A combination of angle- and magnitude-based gradient conflicts, where both the directional misalignment and magnitude disparity hinder effective gradient aggregation.</span>
 </Figure>
 
-## Image comparison slider
 
-An interactive, accessible slider component with keyboard navigation.
-<Figure>
-  <ImageComparison slot="figure" client:load imageUrlOne={dogsDiffc.src} imageUrlTwo={dogsTrue.src} altTextOne="Photo of two dogs running side-by-side in shallow water, lossily compressed using the DiffC algorithm" altTextTwo="Original photo of two dogs running side-by-side in shallow water" />
-  <span slot="caption">A photo of two dogs running side-by-side in shallow water, lossily compressed using the <a href="https://jeremyiv.github.io/diffc-project-page/">DiffC algorithm</a>.</span>
-</Figure>
+### Synthetic Problem
+To illustrate the gradient surgery problem in a simplified setting, we adopt the 2D multi-task optimisation problem proposed in Nash-MTL (Navon et al. 2022). 
+This problem provides a controlled environment for the study of conflicting gradient across tasks, highlighting the challenges of multi-task optimisation.
+In addition, we introduce a novel variant of that problem with a similar loss landscape structure, featuring two global minima, providing a different problem setting to analyse the impact of multiple optima on optimisation dynamics.
 
-## Two columns
-
-Use the two columns component to display two columns of content. In this example, the first column contains a figure with a YouTube video and the second column contains a figure with a custom [React](https://react.dev/) component. By default, they display side by side, but if the screen is narrow enough (for example, on mobile), they're arranged vertically.
-
-<TwoColumns>
+Illustration of the multi-task optimisation problem with two loss function with one optimal solution and the *MTL* problem computed as the sum of two losses.
+<ThreeColumns>
   <Figure slot="left">
-    <YouTubeVideo slot="figure" videoId="wjZofJX0v4M" />
-    <span slot="caption">Take a look at this YouTube video.</span>
+    <Image slot="figure" source={img1of1} altText="" />
+    <span slot="caption"></span>
+  </Figure>
+  <Figure slot="center">
+    <Image slot="figure" source={img1of2} altText="" />
+    <span slot="caption"></span>
   </Figure>
   <Figure slot="right">
-    <Splat slot="figure" client:idle />
-    <span slot="caption">Now look at this <a href="https://en.wikipedia.org/wiki/Gaussian_splatting">Gaussian splat</a>, rendered with a React component.</span>
+    <Image slot="figure" source={img1of12} altText="" />
+    <span slot="caption"></span>
   </Figure>
-</TwoColumns>
+</ThreeColumns>
 
-## Heading levels
 
-Use headings to divide your content into sections.
+ Illustration of the multi-task optimisation problem with two loss function with one optimal solution and one local optima solution. The *MTL* problem computed as the sum of two losses.
+<ThreeColumns>
+  <Figure slot="left">
+    <Image slot="figure" source={img2of1} altText="" />
+    <span slot="caption"></span>
+  </Figure>
+  <Figure slot="center">
+    <Image slot="figure" source={img2of2} altText="" />
+    <span slot="caption"></span>
+  </Figure>
+  <Figure slot="right">
+    <Image slot="figure" source={img2of12} altText="" />
+    <span slot="caption"></span>
+  </Figure>
+</ThreeColumns>
 
-### Heading 3
 
-Go down a level to heading 3...
+### Algorithm
 
-#### Heading 4
+<Figure>
+  <Image slot="figure" source={samgs} altText="" />
+  <span slot="caption"></span>
+</Figure>
 
-...and down again to heading 4.
-
-## LaTeX
-
-You can also add LaTeX formulas, rendered during the build process using [KaTeX](https://katex.org/) so they're quick to load for visitors of your project page. You can write them inline, like this: <LaTeX inline formula="a^2 + b^2 = c^2" />. Or, you can write them as a block:
-
-<LaTeX formula="\int_a^b f(x) dx" />
-
-## Tables
-
-You can add simple tables using [GitHub Flavored Markdown syntax](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/organizing-information-with-tables):
-
-| Model | Accuracy | F1 score | Training time (hours) |
-| :--- | :---: | :---: | :---: |
-| BERT-base | 0.89 | 0.87 | 4.5 |
-| RoBERTa-large | 0.92 | 0.91 | 7.2 |
-| DistilBERT | 0.86 | 0.84 | 2.1 |
-| XLNet | 0.90 | 0.89 | 6.8 |
 
 ## BibTeX citation
 

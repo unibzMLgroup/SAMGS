@@ -1,0 +1,15 @@
+---
+// TODO: when the page is narrow enough, figures with images don't have any horizontal padding
+---
+
+<div class="grid gap-4 w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+  <div class="min-w-[16rem]">
+    <slot name="left" />
+  </div>
+  <div class="min-w-[16rem]">
+    <slot name="center" />
+  </div>
+  <div class="min-w-[16rem]">
+    <slot name="right" />
+  </div>
+</div>
