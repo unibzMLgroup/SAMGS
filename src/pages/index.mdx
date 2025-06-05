@@ -38,20 +38,23 @@ export const components = {pre: CodeBlock, table: Table}
   authors={[
     {
       name: "Thomas Borsani",
-      url: "https://github.com/ThomBors",
+      url: "https://scholar.google.com/citations?user=4MwSGvIAAAAJ&hl=en&oi=ao",
       notes: ["1"],
     },
     {
       name: "Andrea Rosani",
+      url: "https://scholar.google.com/citations?user=KF9OqSMAAAAJ&hl=en&oi=ao",
       notes: ["1"],
     },
     {
       name: "Giuseppe Nicosia",
+      url: "https://scholar.google.com/citations?user=5FilzyUAAAAJ&hl=en&oi=ao",
       notes: ["2"],
     },
     {
       name: "Giuseppe Di Fatta",
-      notes: ["2"],
+      url: "https://scholar.google.com/citations?user=BB5R4P8AAAAJ&hl=en&oi=ao",
+      notes: ["1"],
     },
   ]}
   conference="ECML PKDD 2025"
@@ -104,7 +107,7 @@ The proposed approach focuses solely on *magnitude gradient conflicts*, which ar
 Let us examine why *angle-based gradient conflicts* may slow down convergence, while *magnitude gradient conflicts* can severely hinder the overall optimisation process—potentially preventing certain tasks from converging altogether.
 
 When adding two task gradients <LaTeX inline formula="\mathbf{g}_i" /> and <LaTeX inline formula="\mathbf{g}_j" /> of similar magnitude (<LaTeX inline formula="|\mathbf{g}_i| \simeq |\mathbf{g}_j|" />), but with an angle <LaTeX inline formula="\alpha > 90^{\circ}" /> between them, the magnitude of their sum is reduced due to destructive interference. Specifically, the resultant magnitude is scaled by a factor proportional to <LaTeX inline formula="\cos(\alpha)" />, as illustrated in Figures <a href="#fig:a">a</a> and <a href="#fig:b">b</a>.  
-In the worst-case scenario—<LaTeX inline formula="\alpha = 180^\circ" />—the gradients point in exactly opposite directions and cancel each other out. However, such extreme angular conflicts are rare in practice. Even when partially cancelling, the resulting vector still encodes meaningful optimisation direction, which can be amplified by first-order momentum mechanisms without explicitly resolving the angle conflict.
+In the worst-case scenario (<LaTeX inline formula="\alpha = 180^\circ" />) the gradients point in exactly opposite directions and cancel each other out. However, such extreme angular conflicts are rare in practice. Even when partially cancelling, the resulting vector still encodes meaningful optimisation direction, which can be amplified by first-order momentum mechanisms without explicitly resolving the angle conflict.
 
 In contrast, when one task’s gradient is significantly larger than the others (<LaTeX inline formula="|\mathbf{g}_i| \gg |\mathbf{g}_j|" />), the aggregated gradient direction becomes dominated by that task. This is much more harmful, as it biases the optimisation process toward a single objective, effectively stalling learning for other tasks (see Figure <a href="#fig:c">c</a>).  
 
